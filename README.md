@@ -4,6 +4,10 @@ The workshop is intended to be conducted with audience participation in approxim
 
 The workshop is broken up into 3 parts, the 3rd of which is optional.
 
+Links to resources from which this content is derived:
+- https://aws.amazon.com/blogs/security/how-to-automatically-update-your-security-groups-for-amazon-cloudfront-and-aws-waf-by-using-aws-lambda/
+
+
 ## simple demonstration of security groups and the CLI ability to view and modify AWS resources
 Part 1:
 - Via the console create a security group that permits SSH ingress with no egress (ssh-sg) 
@@ -28,6 +32,15 @@ Part 1:
 ## implementation of the blog post for automating the update of security groups when AWS publishes IP changes
 Part 2:
 - In a browser open the IP addresses JSON document published by AWS
+  - https://ip-ranges.amazonaws.com/ip-ranges.json
+  - sample ```jq``` commands:
+    - list all IP prefixes that are globally available for the AMAZON service:
+      jq '.prefixes[] | select (.region == "GLOBAL" and .service == "AMAZON") | .ip_prefix' ip-ranges.json
+    - list all unique regions
+      jq '.prefixes[].region' ip-ranges.json | sort -u
+    - list all unique services
+      jq '.prefixes[].service' ip-ranges.json | sort -u
+
 - Via the console create an IAM policy that will allow something to modify security groups
 - Via the console create a role which that can be assumed by Lambda and has the policy attached
 - Via the console create a Lambda function with the role and policy to process the JSON document and update the security groups
@@ -41,5 +54,10 @@ Part 3:
 
 # Resources
 ---
+Create security groups with three tags to control regional and global access to services: 
+- managed = true
+- region = <one of global, eu-west-1, eu-west-2, etc>
+- service = <one of ec2, amazon, cloudfront, etc>
+
 Cloudformation to create users:
 
