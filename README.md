@@ -1,15 +1,19 @@
+# Automated compliance workshop
 This workshop was originally created in October of 2017 in support of getting LSEG engaged in governance and using the tools available to them in AWS.
 
 The workshop is intended to be conducted with audience participation in approximately 90 minutes.
 
-The workshop is broken up into 3 parts, the 3rd of which is optional.
+The workshop is broken up into 4 parts, the 3rd and 4th of which are optional.
 
 Links to resources from which this content is derived:
 - https://aws.amazon.com/blogs/security/how-to-automatically-update-your-security-groups-for-amazon-cloudfront-and-aws-waf-by-using-aws-lambda/
 - https://github.com/awslabs/aws-config-rules
+- https://aws.amazon.com/blogs/compute/automating-security-group-updates-with-aws-lambda/
 
-## Simple demonstration of security groups and the CLI ability to view and modify AWS resources
-Part 1:
+## Part 1: demonstrate the security groups concept
+Simple demonstration of security groups and the CLI ability to view and modify AWS resources
+
+### Steps:
 - Via the console create a security group that permits SSH ingress with no egress (ssh-sg) 
   
   - EC2 > Security Groups > Create Security Group
@@ -31,8 +35,16 @@ Part 1:
 - From the SSH session confirm that you can now make HTTP requests to httpjs.net
 - Confirm that you cannot execute ```aws ec2 describe-instances```
 
-## Implementation of a modification of the blog post for automating the update of security groups when AWS publishes IP changes
-Part 2:
+## Part 2: Demonstrate a Lambda to modify security group egress rules
+Implementation of a modification of the blog post for automating the update of security groups when AWS publishes IP changes
+
+**Note:**
+The Lambda in this part will update security groups based on their region and service.  Create security groups with three tags to control regional and global access to services: 
+- managed = true
+- region = <one of global, eu-west-1, eu-west-2, etc>
+- service = <one of ec2, amazon, cloudfront, etc>
+
+### Steps
 - In a browser open the IP addresses JSON document published by AWS
   - https://ip-ranges.amazonaws.com/ip-ranges.json
   - sample ```jq``` commands:
@@ -49,20 +61,29 @@ Part 2:
 - Via the console issue a test event and view the changes reflected in the security group
 - From the SSH session confirm that you can query the AWS API but no other websites
 
-## Implement a Config Rule that ensures all EC2 instances have mandatory security groups attached 
-Part 3:
+## Part 3: Demonstrate Config rules
+
+Implement a Config Rule that ensures all EC2 instances have mandatory security groups attached 
+
+**Note:** Part 3 and 4 contain Lambda functions that seek out EC2 instances which do not have mandatory security groups attached.  In preparation for these parts create one or more security groups that have a tag of 'mandatory' = 'true'.  The Lambda functiosn will ensure that all EC2 instances that do not have a tag of 'exempt' = 'true' have the mandatory security groups attached.**
+
+### Steps:
 - Via the console create an IAM policy that will allow a Lambda function to modify EC2 instances
 - Via the console create a role that can be assumed by Lambda and has the policy attached
 - Via the console create a Lambda function with the role and policy to process a Config event and update EC2 instances
 - Via the console create a Config rule which points at the ARN of the Lambda function, configure it to trigger on security group changes or EC2 instance changes
 - Create an EC2 instance that is non-compliant
 
-**Note**: Config can take up to 10 minutes to notice the creation of the EC2 instance and apply its configuration rules.  If undesired consider using CloudWatch Events for near real-time operation.
+**Note:** Config can take up to 10 minutes to notice the creation of the EC2 instance and apply its configuration rules.  If undesired consider using CloudWatch Events for near real-time operation.
 
+## Step 4: CloudWatch Rules is faster than Config
 
-# Resources
----
-Create security groups with three tags to control regional and global access to services: 
-- managed = true
-- region = <one of global, eu-west-1, eu-west-2, etc>
-- service = <one of ec2, amazon, cloudfront, etc>
+For faster reaction times implement a CloudWatch Rule
+
+### Steps:
+- Via the console create an IAM policy that will allow a Lambda function to modify EC2 instances
+- Via the console create a role that can be assumed by Lambda and has the policy attached
+- Via the console create a Lambda function with the role and policy to process a CloudWatch event and update EC2 instances
+- Via the console create a CloudWatch Rule that triggers when an EC2 instance changes state to either Pending or Running, configure the rule to execute the Lambda function
+- Via the console create an EC2 instance that is not a part of the mandatory security group, within seconds the newly created EC2 instance should be updated to have the mandatory security groups
+
