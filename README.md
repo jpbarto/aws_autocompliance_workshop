@@ -8,7 +8,7 @@ Links to resources from which this content is derived:
 - https://aws.amazon.com/blogs/security/how-to-automatically-update-your-security-groups-for-amazon-cloudfront-and-aws-waf-by-using-aws-lambda/
 - https://github.com/awslabs/aws-config-rules
 
-## simple demonstration of security groups and the CLI ability to view and modify AWS resources
+## Simple demonstration of security groups and the CLI ability to view and modify AWS resources
 Part 1:
 - Via the console create a security group that permits SSH ingress with no egress (ssh-sg) 
   
@@ -31,7 +31,7 @@ Part 1:
 - From the SSH session confirm that you can now make HTTP requests to httpjs.net
 - Confirm that you cannot execute ```aws ec2 describe-instances```
 
-## implementation of the blog post for automating the update of security groups when AWS publishes IP changes
+## Implementation of a modification of the blog post for automating the update of security groups when AWS publishes IP changes
 Part 2:
 - In a browser open the IP addresses JSON document published by AWS
   - https://ip-ranges.amazonaws.com/ip-ranges.json
@@ -49,9 +49,15 @@ Part 2:
 - Via the console issue a test event and view the changes reflected in the security group
 - From the SSH session confirm that you can query the AWS API but no other websites
 
-## implement a Config Rule that ensures all EC2 instances have the egress-sg security group attached 
+## Implement a Config Rule that ensures all EC2 instances have mandatory security groups attached 
 Part 3:
-- 
+- Via the console create an IAM policy that will allow a Lambda function to modify EC2 instances
+- Via the console create a role that can be assumed by Lambda and has the policy attached
+- Via the console create a Lambda function with the role and policy to process a Config event and update EC2 instances
+- Via the console create a Config rule which points at the ARN of the Lambda function, configure it to trigger on security group changes or EC2 instance changes
+- Create an EC2 instance that is non-compliant
+
+**Note**: Config can take up to 10 minutes to notice the creation of the EC2 instance and apply its configuration rules.  If undesired consider using CloudWatch Events for near real-time operation.
 
 
 # Resources
