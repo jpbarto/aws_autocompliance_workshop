@@ -15,7 +15,7 @@ logger = logging.getLogger('lambda.handler')
 logger.setLevel(logging.INFO)
 
 SERVICES = ('AMAZON', 'EC2')
-REGIONS = ('GLOBAL', 'eu-west-1')
+REGIONS = ('GLOBAL', 'ap-southeast-2')
 
 
 def handler(event, context):
@@ -30,7 +30,7 @@ def handler(event, context):
 
     # update the security groups
     result = {'updated_security_groups': []}
-    client = boto3.client('ec2', region_name='eu-west-1')
+    client = boto3.client('ec2', region_name='ap-southeast-2')
     for region in REGIONS:
         for service in service_ranges[region]:
             groups = get_security_groups_for_update (client, {'managed': 'true', 'region': region.lower(), 'service': service.lower()})

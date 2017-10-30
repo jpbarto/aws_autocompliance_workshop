@@ -7,3 +7,4 @@ Resources:
     Properties:
       Handler: lambda.handler
       Runtime: python3.6
+      Timeout: 10

@@ -9,6 +9,7 @@ Links to resources from which this content is derived:
 - https://aws.amazon.com/blogs/security/how-to-automatically-update-your-security-groups-for-amazon-cloudfront-and-aws-waf-by-using-aws-lambda/
 - https://github.com/awslabs/aws-config-rules
 - https://aws.amazon.com/blogs/compute/automating-security-group-updates-with-aws-lambda/
+- http://docs.aws.amazon.com/general/latest/gr/aws-ip-ranges.html
 
 ## Part 1: demonstrate the security groups concept
 Simple demonstration of security groups and the CLI ability to view and modify AWS resources
@@ -43,6 +44,9 @@ The Lambda in this part will update security groups based on their region and se
 - managed = true
 - region = <one of global, eu-west-1, eu-west-2, etc>
 - service = <one of ec2, amazon, cloudfront, etc>
+
+**Note:**
+The regional services control the communication with the service control plane in a given region.  Therefore if an EC2 instance can communicate with the EC2 service in eu-west-1 it will not be able to communicate with the EC2 plane in eu-west-2 until granted access to those IPs.
 
 ### Steps
 - In a browser open the IP addresses JSON document published by AWS
