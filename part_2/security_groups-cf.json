@@ -1,0 +1,103 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "Create security groups to be managed by a Lambda function that reads the AWS IP Ranges JSON document",
+    "Parameters": {
+        "TargetVPC": {
+            "Description": "VPC for security groups",
+            "Type": "AWS::EC2::VPC::Id"
+        }
+    },
+    "Resources": {
+        "LocalEC2": {
+            "Type": "AWS::EC2::SecurityGroup",
+            "Properties": {
+                "GroupName": "ap-southeast-2-ec2",
+                "GroupDescription": "Local EC2 security group",
+                "VpcId": {
+                    "Ref": "TargetVPC"
+                },
+                "SecurityGroupEgress": [{
+                    "IpProtocol": "-1",
+                    "CidrIp": "127.0.0.1/32"
+                }],
+                "Tags": [{
+                        "Key": "managed",
+                        "Value": "true"
+                    },
+                    {
+                        "Key": "region",
+                        "Value": "ap-southeast-2"
+                    },
+                    {
+                        "Key": "service",
+                        "Value": "ec2"
+                    }
+                ]
+            }
+        },
+        "LocalAmazon": {
+            "Type": "AWS::EC2::SecurityGroup",
+            "Properties": {
+                "GroupName": "ap-southeast-2-amazon",
+                "GroupDescription": "Local Amazon security group",
+                "VpcId": {
+                    "Ref": "TargetVPC"
+                },
+                "SecurityGroupEgress": [{
+                    "IpProtocol": "-1",
+                    "CidrIp": "127.0.0.1/32"
+                }],
+                "Tags": [{
+                        "Key": "managed",
+                        "Value": "true"
+                    },
+                    {
+                        "Key": "region",
+                        "Value": "ap-southeast-2"
+                    },
+                    {
+                        "Key": "service",
+                        "Value": "amazon"
+                    }
+                ]
+            }
+        },
+        "GlobalAmazon": {
+            "Type": "AWS::EC2::SecurityGroup",
+            "Properties": {
+                "GroupName": "global-amazon",
+                "GroupDescription": "Global Amazon security group",
+                "VpcId": {
+                    "Ref": "TargetVPC"
+                },
+                "SecurityGroupEgress": [{
+                    "IpProtocol": "-1",
+                    "CidrIp": "127.0.0.1/32"
+                }],
+                "Tags": [{
+                        "Key": "managed",
+                        "Value": "true"
+                    },
+                    {
+                        "Key": "region",
+                        "Value": "global"
+                    },
+                    {
+                        "Key": "service",
+                        "Value": "amazon"
+                    }
+                ]
+            }
+        }
+    },
+    "Outputs": {
+
+        "LocalEC2": {
+            "Value": {
+                "Ref": "LocalEC2"
+            }
+
+        }
+
+    }
+}
